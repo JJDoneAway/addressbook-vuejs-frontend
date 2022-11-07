@@ -1,7 +1,4 @@
 <template>
-  <header class="w3-container">
-    <h1>Address Book</h1>
-  </header>
   <AddressBook />
 </template>
 
