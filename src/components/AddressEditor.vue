@@ -146,6 +146,7 @@ export default {
       this.address.email = "";
       // eslint-disable-next-line vue/no-mutating-props
       this.address.phone = "";
+      this.validationErrors = [];
       this.$emit("update:modelValue", this.address);
     },
     updateAddress() {

@@ -2,7 +2,7 @@
   <header class="w3-container">
     <div class="w3-bar">
       <span class="w3-bar-item w3-right"
-        ><button @click="reset()">Reset Data</button></span
+        ><button @click="resetData()">Reset Data</button></span
       >
     </div>
   </header>
@@ -37,14 +37,14 @@
         title="Create new address"
         :address="newAddress"
         create
-        @create-address="createAddress"
+        @create-address="createAddress(newAddress)"
       />
       <p />
       <AddressEditor
         title="Update address"
         :address="selectedAddress"
-        @update-address="updateAddress"
-        @delete-address="deleteAddress"
+        @update-address="updateAddress(selectedAddress)"
+        @delete-address="deleteAddress(selectedAddress)"
       />
       <p />
     </div>
@@ -52,99 +52,60 @@
 </template>
 
 <script>
-import axios from "axios";
+import { ref } from "vue";
 import AddressEditor from "./AddressEditor.vue";
+import loadContent from "./api/loadContent";
+import updateContent from "./api/updateContent";
+import resetContent from "./api/resetContent";
+import deleteContent from "./api/deleteContent";
+import insertContent from "./api/insertContent";
 
 export default {
+  setup() {
+    const selectedAddress = ref({});
+    const newAddress = ref({});
+
+    const activate = (address) =>
+      (selectedAddress.value = address == null ? null : { ...address });
+
+    const isSelected = (address) => {
+      return (
+        selectedAddress.value != null &&
+        address != null &&
+        selectedAddress.value.id == address.id
+      );
+    };
+
+    const { addresses, getData } = loadContent();
+
+    const { createAddress } = insertContent(getData, (address) => {
+      activate(address);
+      newAddress.value = {};
+    });
+
+    const { updateAddress } = updateContent(getData, activate);
+
+    const { deleteAddress } = deleteContent(getData, activate);
+
+    const { resetData } = resetContent(getData, activate);
+
+    return {
+      addresses,
+      selectedAddress,
+      newAddress,
+      isSelected,
+      getData,
+      resetData,
+      createAddress,
+      updateAddress,
+      deleteAddress,
+      activate,
+    };
+  },
+
   name: "AddressBook",
   components: {
     AddressEditor,
-  },
-  data() {
-    return {
-      addresses: [],
-      selectedAddress: null,
-      newAddress: {},
-    };
-  },
-  methods: {
-    async getData() {
-      try {
-        const response = await axios.get("http://localhost:8080/addresses");
-        this.addresses = response.data;
-        this.addresses.sort((a, b) => {
-          return a.lastName === b.lastName
-            ? a.firstName.localeCompare(b.firstName)
-            : a.lastName.localeCompare(b.lastName);
-        });
-        this.clearAddress();
-      } catch (error) {
-        console.log("Can not load data");
-        console.log(error);
-      }
-    },
-    async deleteAddress() {
-      try {
-        await axios.delete(
-          "http://localhost:8080/addresses/" + this.selectedAddress.id
-        );
-        this.getData();
-        this.selectedAddress = null;
-      } catch (error) {
-        console.log("Can not delete address");
-        console.log(error);
-      }
-    },
-    async updateAddress() {
-      try {
-        let oldSelected = { ...this.selectedAddress };
-        await axios.put(
-          "http://localhost:8080/addresses/" + this.selectedAddress.id,
-          this.selectedAddress
-        );
-        this.getData();
-        this.activate(oldSelected);
-      } catch (error) {
-        console.log("Can not update address");
-        console.log(error);
-      }
-    },
-    async createAddress() {
-      try {
-        await axios.post("http://localhost:8080/addresses", this.newAddress);
-        this.getData();
-      } catch (error) {
-        console.log("Can not update address");
-        console.log(error);
-      }
-    },
-    async reset() {
-      try {
-        await axios.patch("http://localhost:8080/addresses");
-        this.getData();
-        this.selectedAddress = null;
-        this.clearAddress();
-      } catch (error) {
-        console.log("Can not update address");
-        console.log(error);
-      }
-    },
-    clearAddress() {
-      this.newAddress = {};
-    },
-    activate(address) {
-      this.selectedAddress = { ...address };
-    },
-    isSelected(address) {
-      return (
-        this.selectedAddress != null &&
-        address != null &&
-        this.selectedAddress.id == address.id
-      );
-    },
-  },
-  created() {
-    this.getData();
   },
 };
 </script>
