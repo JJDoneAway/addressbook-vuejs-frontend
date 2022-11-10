@@ -1,5 +1,5 @@
 <template>
-  <div v-if="address" class="w3-card-4">
+  <div v-if="showEditor" class="w3-card-4">
     <!-- title-->
     <div class="w3-container w3-blue-grey">
       <h5>{{ title }}</h5>
@@ -129,6 +129,14 @@ export default {
     return {
       validationErrors: [],
     };
+  },
+  computed: {
+    showEditor() {
+      return (
+        this.create |
+        (this.address != null && Object.keys(this.address).length > 0)
+      );
+    },
   },
   methods: {
     emitValue(e) {
