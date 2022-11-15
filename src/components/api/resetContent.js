@@ -3,7 +3,7 @@ import axios from "axios";
 export default function resetContent(getData, emit) {
   const resetData = async () => {
     try {
-      await axios.patch("http://localhost:8080/addresses");
+      await axios.patch(`${process.env.VUE_APP_URL}/addresses`);
       getData();
       emit(null);
     } catch (error) {

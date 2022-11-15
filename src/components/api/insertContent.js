@@ -3,9 +3,8 @@ import axios from "axios";
 export default function insertContent(getData, emit) {
   const createAddress = async (selectedAddress) => {
     try {
-      console.log(selectedAddress);
       const response = await axios.post(
-        "http://localhost:8080/addresses",
+        `${process.env.VUE_APP_URL}/addresses`,
         selectedAddress
       );
       getData();

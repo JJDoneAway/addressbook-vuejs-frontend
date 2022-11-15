@@ -4,7 +4,7 @@ export default function deleteContent(getData, emit) {
   const deleteAddress = async (selectedAddress) => {
     try {
       await axios.delete(
-        "http://localhost:8080/addresses/" + selectedAddress.id
+        `${process.env.VUE_APP_URL}/addresses/${selectedAddress.id}`
       );
       getData();
       emit(null);

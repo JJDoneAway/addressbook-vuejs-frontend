@@ -1,6 +1,12 @@
 <template>
   <header class="w3-container">
     <div class="w3-bar">
+      <span class="w3-bar-item"
+        >Used Backend:
+        <a :href="getBackend + '/addresses'" target="_blank">{{
+          getBackend
+        }}</a></span
+      >
       <span class="w3-bar-item w3-right"
         ><button @click="resetData()">Reset Data</button></span
       >
@@ -106,6 +112,11 @@ export default {
   name: "AddressBook",
   components: {
     AddressEditor,
+  },
+  computed: {
+    getBackend() {
+      return process.env.VUE_APP_URL;
+    },
   },
 };
 </script>
